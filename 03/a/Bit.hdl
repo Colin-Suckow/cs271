@@ -15,4 +15,7 @@ CHIP Bit {
 
     PARTS:
     // Put your code here:
+    Not(in=load, out=notload);
+    Mux(a=in, b=feedback, sel=notload, out=ddfin);
+    DFF(in=ddfin, out=out, out=feedback);
 }
