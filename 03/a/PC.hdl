@@ -16,5 +16,9 @@ CHIP PC {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    Register(in=memoryin, load=anyflag, out=currentmemory, out=out);
+    Inc16(in=currentmemory, out=memoryoutinc);
+    Or(a=load, b=inc, out=loadorinc);
+    Or(a=loadorinc, b=reset, out=anyflag);
+    Mux8Way16(a=currentmemory, b=in, c=memoryoutinc, d=in, e[0..15]=false, f[0..15]=false, g[0..15]=false, h[0..15]=false, sel[0]=load, sel[1]=inc, sel[2]=reset, out=memoryin);
 }
