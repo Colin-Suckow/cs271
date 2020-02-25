@@ -28,20 +28,19 @@ CHIP Memory {
 
     PARTS:
     // Put your code here:
-    Not(in=address[14], out=notMSB);
-    DMux(in=load, sel=address[14], a=load1, b=load2);
-    RAM16K(in=in, load=load1, address=address[0..13], out=out1);
-    RAM16K(in=in, load=load2, address=address[0..13], out=out2);
-    Mux16(a=out1, b=out2, sel=address[14], out=memout);
 
-    Screen(in=in, load=load2, address=address[1..13], out=screenout);
+     DMux4Way(in=load, sel=address[13..14], a=loadmem, b=loadmem2, c=loadscreen, d=loadkbd);
+     Or(a=loadmem, b=loadmem2, out=loadeithermem);
+    
+    RAM16K(in=in, load=loadeithermem, address=address[0..13], out=memout);
+    Screen(in=in, load=loadscreen, address=address[0..12], out=screenout);
     Keyboard(out=kbdout);
 
-    And(a=address[13], b=address[14], out=ioselector);
 
-    Mux16(a=screenout, b=kbdout, sel=address[14], out=ioout);
+   
+    Mux4Way16(a=memout, b=memout, c=screenout, d=kbdout, sel=address[13..14], out=out);
 
-    Mux16(a=memout, b=ioout, sel=ioselector, out=out);
+    
     
 
 }
