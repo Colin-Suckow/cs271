@@ -32,6 +32,9 @@ CHIP CPU {
         reset;           // Signals whether to re-start the current
                          // program (reset==1) or continue executing
                          // the current program (reset==0).
+    
+
+
 
     OUT outM[16],        // M value output
         writeM,          // Write to M? 
@@ -40,4 +43,38 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+
+    Not(in=instruction[15], out=isA);
+
+    Mux16(a=instruction, b=aluOut, sel=instruction[15], out=dataMux);
+
+    Mux16(a=aRegister, b=inM, sel=instruction[12], out=AMmux);
+
+    And(a=instruction[5], b=instruction[15], out=loadAWithC);
+    And(a=instruction[4], b=instruction[15], out=loadDWithC);
+    And(a=instruction[3], b=instruction[15], out=writeM);
+
+    And(a=canjlt, b=instruction[2], out=jlt);
+    And(a=canjeq, b=instruction[1], out=jeq);
+    And(a=canjgt, b=instruction[0], out=jgt);
+
+    Or(a=jgt, b=jlt, out=jumpOr1);
+    Or(a=jeq, b=jumpOr1, out=shouldJumpifC);
+
+    And(a=shouldJumpifC, b=instruction[15], out=shouldJump);
+
+    Or(a=isA, b=loadAWithC, out=loadA);
+
+    Not(in=shouldJump, out=shouldIncrement);
+
+    ARegister(in=dataMux, load=loadA, out=aRegister, out[0..14]=addressM);
+    DRegister(in=aluOut, load=loadDWithC, out=dRegister);
+
+    PC(in=aRegister, load=shouldJump, inc=shouldIncrement, reset=reset, out[0..14]=pc);
+    
+
+    ALU(x=dRegister, y=AMmux, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=aluOut, out=outM, zr=canjeq, ng=canjlt);
+    Not(in=canjlt, out=couldjgtIfNotZero);
+    Not(in=canjeq, out=isNotZero);
+    And(a=isNotZero, b=couldjgtIfNotZero, out=canjgt);
 }

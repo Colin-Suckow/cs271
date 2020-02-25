@@ -34,7 +34,7 @@ CHIP Memory {
     RAM16K(in=in, load=load2, address=address[0..13], out=out2);
     Mux16(a=out1, b=out2, sel=address[14], out=memout);
 
-    Screen(in=in, load=load2, address=address[2..14], out=screenout);
+    Screen(in=in, load=load2, address=address[1..13], out=screenout);
     Keyboard(out=kbdout);
 
     And(a=address[13], b=address[14], out=ioselector);
