@@ -1,34 +1,18 @@
-use crate::instruction::{Computation, Jump, Destination, Instruction, Binary};
+use crate::instruction::{Instruction, Binary};
 
-fn assemble_instruction(instruction: &Instruction) -> u16 {
-    //TODO: Find a better way to organize this
-    add_component(
-        add_component(
-            add_component(
-                add_component(
-                    0b0000000000000000   
-                , instruction.value)
-            , instruction.jump)    
-        , instruction.destination)    
-    , instruction.computation)
-
+fn assemble_instruction(instruction: &Instruction) -> u16 {    
+    0b0000000000000000
+        .add_component(instruction.value)
+        .add_component(instruction.jump)
+        .add_component(instruction.destination)
+        .add_component(instruction.computation)
 }
-
-fn add_component<T: Binary>(instruction: u16, component: Option<T>) -> u16 {
-    instruction | match component {
-        Some(dest) => dest.value(),
-        _ => 0x0
-    }
-}
-
-
-
-pub fn do_nothing() {}
 
 #[cfg(test)]
 mod tests {
 
     use super::*;
+    use crate::instruction::{Computation, Jump, Destination};
 
     //0
     #[test]

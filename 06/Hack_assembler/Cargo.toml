@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 [package]
 name = "hack_assembler"
 version = "0.1.0"
@@ -8,3 +9,5 @@ edition = "2018"
 
 [dependencies]
 regex="1"
+
+

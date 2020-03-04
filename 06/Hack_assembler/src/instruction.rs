@@ -1,5 +1,15 @@
+use std::str::FromStr;
+use std::fmt;
+
 pub trait Binary {
     fn value(&self) -> u16;
+
+    fn add_component<T: Binary>(&self, component: Option<T>) -> u16 {
+        self.value() | match component {
+            Some(dest) => dest.value(),
+            _ => 0x0
+        }
+    }
 }
 
 impl Binary for u16 {
@@ -8,7 +18,7 @@ impl Binary for u16 {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Computation {
     Zero,
     One,
@@ -27,7 +37,7 @@ pub enum Computation {
     DMinusA,
     AMinusD,
     DAndA,
-    DoOrA,
+    DOrA,
 }
 
 impl Binary for Computation {
@@ -50,11 +60,39 @@ impl Binary for Computation {
             Computation::DMinusA => 0b1000010011000000,
             Computation::AMinusD => 0b1000000111000000,
             Computation::DAndA => 0b1000000000000000,
-            Computation::DoOrA => 0b1000010101000000,
+            Computation::DOrA => 0b1000010101000000,
         }
     }
 }
-#[derive(Copy, Clone)]
+
+impl FromStr for Computation {
+    type Err = InstructionParseError;
+    fn from_str(s: &str) -> Result<Computation, Self::Err> {
+        match s {
+            "0" => Ok(Computation::Zero),
+            "1" => Ok(Computation::One),
+            "-1" => Ok(Computation::NegativeOne),
+            "D" => Ok(Computation::D),
+            "A" => Ok(Computation::A),
+            "!D" => Ok(Computation::NotD),
+            "!A" => Ok(Computation::NotA),
+            "-D" => Ok(Computation::NegativeD),
+            "-A" => Ok(Computation::NegativeA),
+            "D+1" => Ok(Computation::DPlusOne),
+            "A+1" => Ok(Computation::APlusOne),
+            "D-1" => Ok(Computation::DMinusOne),
+            "A-1" => Ok(Computation::AMinusOne),
+            "D+A" => Ok(Computation::DPlusA),
+            "D-A" => Ok(Computation::DMinusA),
+            "A-D" => Ok(Computation::AMinusD),
+            "D&A" => Ok(Computation::DAndA),
+            "D|A" => Ok(Computation::DOrA),
+            _ => Err(InstructionParseError{})
+        }
+    }
+}
+
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Destination {
     M,
     D,
@@ -79,7 +117,23 @@ impl Binary for Destination {
     }
 }
 
-#[derive(Copy, Clone)]
+impl FromStr for Destination {
+    type Err = InstructionParseError;
+    fn from_str(s: &str) -> Result<Destination, Self::Err> {
+        match s {
+            "M" => Ok(Destination::M),
+            "D" => Ok(Destination::D),
+            "MD" => Ok(Destination::MD),
+            "A" => Ok(Destination::A),
+            "AM" => Ok(Destination::AM),
+            "AD" => Ok(Destination::AD),
+            "AMD" => Ok(Destination::AMD),
+            _ => Err(InstructionParseError{})
+        }
+    }
+}
+
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Jump {
     JGT,
     JEQ,
@@ -104,6 +158,23 @@ impl Binary for Jump {
     }
 }
 
+impl FromStr for Jump {
+    type Err = InstructionParseError;
+    fn from_str(s: &str) -> Result<Jump, Self::Err> {
+        match s {
+            "JGT" => Ok(Jump::JGT),
+            "JEQ" => Ok(Jump::JEQ),
+            "JGE" => Ok(Jump::JGE),
+            "JLT" => Ok(Jump::JLT),
+            "JNE" => Ok(Jump::JNE),
+            "JLE" => Ok(Jump::JLE),
+            "JMP" => Ok(Jump::JMP),
+            _ => Err(InstructionParseError{})
+        }
+    }
+}
+
+#[derive(PartialEq, Debug)]
 pub struct Instruction {
     pub computation: Option<Computation>,
     pub value: Option<u16>,
@@ -121,3 +192,14 @@ impl Default for Instruction {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct InstructionParseError  {}
+
+impl fmt::Display for InstructionParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Failed to parse instruction component")
+    }
+}
+
+
