@@ -1,5 +1,6 @@
 use crate::instruction::*;
 use regex::Regex;
+use std::str::FromStr;
 
 
 fn parse_line(line: &str) -> Option<Instruction> {
@@ -22,12 +23,43 @@ fn parse_a_instruction(line: &str) -> Option<Instruction> {
 
 fn parse_c_instruction(line: &str) -> Option<Instruction> {
 
+    //Fragile, fix later
+
     let re = Regex::new(r"=|;").unwrap();
-    let _split_instruction = re.split(line);
-
+    let instruction_components = re.split(line).collect::<Vec<&str>>();
     
+    let re = Regex::new(r"=").unwrap(); 
+    let has_destination = re.is_match(line);
+    
+    let re = Regex::new(r";").unwrap();
+    let has_jump = re.is_match(line);
 
-    Some(Instruction{..Default::default()})
+
+    if has_destination && has_jump {
+        return Some(Instruction{
+            computation: Some(Computation::from_str(instruction_components[1]).unwrap()),
+            destination: Some(Destination::from_str(instruction_components[0]).unwrap()),
+            jump: Some(Jump::from_str(instruction_components[2]).unwrap()),
+            ..Default::default()
+        });
+    } else if has_destination && !has_jump {
+        return Some(Instruction{
+            computation: Some(Computation::from_str(instruction_components[1]).unwrap()),
+            destination: Some(Destination::from_str(instruction_components[0]).unwrap()),
+            ..Default::default()
+        });
+    } else if has_jump && !has_destination {
+        return Some(Instruction{
+            computation: Some(Computation::from_str(instruction_components[0]).unwrap()),
+            jump: Some(Jump::from_str(instruction_components[1]).unwrap()),
+            ..Default::default()
+        });
+    } else {
+        return Some(Instruction{
+            computation: Some(Computation::from_str(instruction_components[0]).unwrap()),
+            ..Default::default()
+        });
+    }
 }
 
 
@@ -59,6 +91,40 @@ mod tests {
 
         assert_eq!(parse_line(instruction_string), Some(Instruction {
             computation: Some(Computation::APlusOne),
+            ..Default::default()
+        }));
+    }
+
+    #[test]
+    fn test_parse_c_dest_no_jump() {
+        let instruction_string = "A=A+1";
+
+        assert_eq!(parse_line(instruction_string), Some(Instruction {
+            computation: Some(Computation::APlusOne),
+            destination: Some(Destination::A),
+            ..Default::default()
+        }));
+    }
+
+    #[test]
+    fn test_parse_c_jump_no_dest() {
+        let instruction_string = "A+1;JMP";
+
+        assert_eq!(parse_line(instruction_string), Some(Instruction {
+            computation: Some(Computation::APlusOne),
+            jump: Some(Jump::JMP),
+            ..Default::default()
+        }));
+    }
+
+    #[test]
+    fn test_parse_c_dest_and_jump() {
+        let instruction_string = "AD=A+1;JGE";
+
+        assert_eq!(parse_line(instruction_string), Some(Instruction {
+            computation: Some(Computation::APlusOne),
+            destination: Some(Destination::AD),
+            jump: Some(Jump::JGE),
             ..Default::default()
         }));
     }
