@@ -1,14 +1,15 @@
-use std::str::FromStr;
 use std::fmt;
+use std::str::FromStr;
 
 pub trait Binary {
     fn value(&self) -> u16;
 
     fn add_component<T: Binary>(&self, component: Option<T>) -> u16 {
-        self.value() | match component {
-            Some(dest) => dest.value(),
-            _ => 0x0
-        }
+        self.value()
+            | match component {
+                Some(dest) => dest.value(),
+                _ => 0x0,
+            }
     }
 }
 
@@ -87,7 +88,7 @@ impl FromStr for Computation {
             "A-D" => Ok(Computation::AMinusD),
             "D&A" => Ok(Computation::DAndA),
             "D|A" => Ok(Computation::DOrA),
-            _ => Err(InstructionParseError{})
+            _ => Err(InstructionParseError {}),
         }
     }
 }
@@ -100,7 +101,7 @@ pub enum Destination {
     A,
     AM,
     AD,
-    AMD
+    AMD,
 }
 
 impl Binary for Destination {
@@ -112,7 +113,7 @@ impl Binary for Destination {
             Destination::A => 0b0000000000100000,
             Destination::AM => 0b0000000000101000,
             Destination::AD => 0b0000000000110000,
-            Destination::AMD => 0b0000000000111000
+            Destination::AMD => 0b0000000000111000,
         }
     }
 }
@@ -128,7 +129,7 @@ impl FromStr for Destination {
             "AM" => Ok(Destination::AM),
             "AD" => Ok(Destination::AD),
             "AMD" => Ok(Destination::AMD),
-            _ => Err(InstructionParseError{})
+            _ => Err(InstructionParseError {}),
         }
     }
 }
@@ -141,7 +142,7 @@ pub enum Jump {
     JLT,
     JNE,
     JLE,
-    JMP
+    JMP,
 }
 
 impl Binary for Jump {
@@ -153,7 +154,7 @@ impl Binary for Jump {
             Jump::JLT => 0b0000000000000100,
             Jump::JNE => 0b0000000000000101,
             Jump::JLE => 0b0000000000000110,
-            Jump::JMP => 0b0000000000000111
+            Jump::JMP => 0b0000000000000111,
         }
     }
 }
@@ -169,7 +170,7 @@ impl FromStr for Jump {
             "JNE" => Ok(Jump::JNE),
             "JLE" => Ok(Jump::JLE),
             "JMP" => Ok(Jump::JMP),
-            _ => Err(InstructionParseError{})
+            _ => Err(InstructionParseError {}),
         }
     }
 }
@@ -179,7 +180,7 @@ pub struct Instruction {
     pub computation: Option<Computation>,
     pub value: Option<u16>,
     pub destination: Option<Destination>,
-    pub jump: Option<Jump>
+    pub jump: Option<Jump>,
 }
 
 impl Default for Instruction {
@@ -188,18 +189,16 @@ impl Default for Instruction {
             computation: None,
             value: None,
             destination: None,
-            jump: None
+            jump: None,
         }
     }
 }
 
 #[derive(Debug)]
-pub struct InstructionParseError  {}
+pub struct InstructionParseError {}
 
 impl fmt::Display for InstructionParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Failed to parse instruction component")
     }
 }
-
-

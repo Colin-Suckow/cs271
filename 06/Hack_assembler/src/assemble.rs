@@ -1,7 +1,7 @@
-use crate::instruction::{Instruction, Binary};
+use crate::instruction::{Binary, Instruction};
 
-fn assemble_instruction(instruction: &Instruction) -> u16 {    
-    0b0000000000000000
+pub fn assemble_instruction(instruction: &Instruction) -> u16 {
+    0x0000
         .add_component(instruction.value)
         .add_component(instruction.jump)
         .add_component(instruction.destination)
@@ -12,7 +12,7 @@ fn assemble_instruction(instruction: &Instruction) -> u16 {
 mod tests {
 
     use super::*;
-    use crate::instruction::{Computation, Jump, Destination};
+    use crate::instruction::{Computation, Destination, Jump};
 
     //0
     #[test]
@@ -22,7 +22,6 @@ mod tests {
             ..Default::default()
         };
         assert_eq!(assemble_instruction(&instruction), 0b1000101010000000);
-        
     }
 
     //1;JMP
@@ -34,7 +33,6 @@ mod tests {
             ..Default::default()
         };
         assert_eq!(assemble_instruction(&instruction), 0b1000111111000111);
-        
     }
 
     //A=D+1
@@ -45,9 +43,7 @@ mod tests {
             destination: Some(Destination::A),
             ..Default::default()
         };
-        
         assert_eq!(assemble_instruction(&instruction), 0b1000011111100000);
-        
     }
 
     //@1
