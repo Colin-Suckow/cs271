@@ -1,7 +1,7 @@
 use crate::instruction::{Binary, Instruction};
 
 pub fn assemble_instruction(instruction: &Instruction) -> u16 {
-    0x0000
+    0x00
         .add_component(instruction.value)
         .add_component(instruction.jump)
         .add_component(instruction.destination)

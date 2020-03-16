@@ -39,29 +39,52 @@ pub enum Computation {
     AMinusD,
     DAndA,
     DOrA,
+
+    M,
+    NotM,
+    NegativeM,
+    MPlusOne,
+    MMinusOne,
+    DPlusM,
+    DMinusM,
+    MMinusD,
+    DAndM,
+    DOrM
 }
 
 impl Binary for Computation {
     fn value(&self) -> u16 {
         match *self {
-            Computation::Zero => 0b1000101010000000,
-            Computation::One => 0b1000111111000000,
-            Computation::NegativeOne => 0b1000111010000000,
-            Computation::D => 0b1000001100000000,
-            Computation::A => 0b1000110000000000,
-            Computation::NotD => 0b1000001101000000,
-            Computation::NotA => 0b1000110001000000,
-            Computation::NegativeD => 0b1000001111000000,
-            Computation::NegativeA => 0b1000110011000000,
-            Computation::DPlusOne => 0b1000011111000000,
-            Computation::APlusOne => 0b1000110111000000,
-            Computation::DMinusOne => 0b1000001110000000,
-            Computation::AMinusOne => 0b1000110010000000,
-            Computation::DPlusA => 0b1000000010000000,
-            Computation::DMinusA => 0b1000010011000000,
-            Computation::AMinusD => 0b1000000111000000,
-            Computation::DAndA => 0b1000000000000000,
-            Computation::DOrA => 0b1000010101000000,
+            Computation::Zero => 0b1110101010000000,
+            Computation::One => 0b1110111111000000,
+            Computation::NegativeOne => 0b1110111010000000,
+            Computation::D => 0b1110001100000000,
+            Computation::A => 0b1110110000000000,
+            Computation::NotD => 0b1110001101000000,
+            Computation::NotA => 0b1110110001000000,
+            Computation::NegativeD => 0b1110001111000000,
+            Computation::NegativeA => 0b1110110011000000,
+            Computation::DPlusOne => 0b1110011111000000,
+            Computation::APlusOne => 0b1110110111000000,
+            Computation::DMinusOne => 0b1110001110000000,
+            Computation::AMinusOne => 0b1110110010000000,
+            Computation::DPlusA => 0b1110000010000000,
+            Computation::DMinusA => 0b1110010011000000,
+            Computation::AMinusD => 0b1110000111000000,
+            Computation::DAndA => 0b1110000000000000,
+            Computation::DOrA => 0b1110010101000000,
+
+            Computation::M => 0b1111110000000000,
+            Computation::NotM => 0b1111110001000000,
+            Computation::NegativeM => 0b1111110011000000,
+            Computation::MPlusOne => 0b1111110111000000,
+            Computation::MMinusOne => 0b1111110010000000,
+            Computation::DPlusM => 0b1111000010000000,
+            Computation::DMinusM => 0b1111010011000000,
+            Computation::MMinusD => 0b1111000111000000,
+            Computation::DAndM => 0b1111000000000000,
+            Computation::DOrM => 0b1111010101000000,
+
         }
     }
 }
@@ -88,6 +111,17 @@ impl FromStr for Computation {
             "A-D" => Ok(Computation::AMinusD),
             "D&A" => Ok(Computation::DAndA),
             "D|A" => Ok(Computation::DOrA),
+
+            "M" => Ok(Computation::M),
+            "!M" => Ok(Computation::NotM),
+            "-M" => Ok(Computation::NegativeM),
+            "M+1" => Ok(Computation::MPlusOne),
+            "M-1" => Ok(Computation::MMinusOne),
+            "D+M" => Ok(Computation::DPlusM),
+            "D-M" => Ok(Computation::DMinusM),
+            "M-D" => Ok(Computation::MMinusD),
+            "D&M" => Ok(Computation::DAndM),
+            "D|M" => Ok(Computation::DOrM),
             _ => Err(InstructionParseError {}),
         }
     }
@@ -191,6 +225,12 @@ impl Default for Instruction {
             destination: None,
             jump: None,
         }
+    }
+}
+
+impl Instruction {
+    pub fn is_empty(self: &Self) -> bool {
+        self.computation == None && self.destination == None && self.jump == None && self.value == None //Also ew. Should make a line object trait or something
     }
 }
 
