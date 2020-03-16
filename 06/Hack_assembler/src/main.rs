@@ -1,3 +1,13 @@
+/*
+Extremely overcomplicated but I feel like a learned a lot abour rust, so it was worth it in the end
+Would change a loooot of stuff though, now that I know more of whats going on. I ignored the existence of labels
+when designing the assembler, which kind of bit me in the but later when I had to shoehorn support in. Main is also pretty messy
+assemble.rs and instruction.rs are the two files I'm least ashamed of, but theres still plenty to change there too. I have no idea how much should be
+a function of instruction or not.
+
+TL;DR not the best way to do it but good learning experience
+*/
+
 mod assemble;
 mod instruction;
 mod parse;
@@ -69,7 +79,7 @@ fn main() -> std::io::Result<()> {
                 }
                 index += 1;
             },
-            None => () //println!("Unable to parse line {}!", index),
+            None => () 
         };
     }
 

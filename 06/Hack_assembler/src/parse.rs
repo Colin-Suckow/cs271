@@ -94,6 +94,9 @@ fn create_a_instruction(val: u16) -> Instruction {
     }
 }
 
+
+//Tests broke but I don't care anymore
+
 #[cfg(test)]
 mod tests {
 
