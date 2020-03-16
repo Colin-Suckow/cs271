@@ -56,17 +56,11 @@ fn main() -> std::io::Result<()> {
     let mut index = 0;
 
     for line in lines.clone() {
-        println!("{}", line);
-    }
-
-    for line in lines.clone() {
         index = match parse_line(line, &mut symbol_table, index, true) {
             Some(_) => index + 1,
             None => index
         }
     }
-
-    symbol_table.print_table();
 
     index = 0;
 
